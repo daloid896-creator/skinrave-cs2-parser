@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Joke Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #16213e 100%);
+            background-attachment: fixed;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .title {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #00ff88 0%, #00ffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .joke-card {
+            background: linear-gradient(135deg, rgba(15, 52, 96, 0.5) 0%, rgba(22, 33, 62, 0.5) 100%);
+            border: 2px solid #00ff88;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.2);
+            backdrop-filter: blur(15px);
+            margin-bottom: 30px;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .joke-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 50px rgba(0, 255, 136, 0.3);
+            border-color: #00ffff;
+        }
+
+        .joke-type {
+            display: inline-block;
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            width: fit-content;
+        }
+
+        .joke-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .joke-setup {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .joke-delivery {
+            font-size: 16px;
+            color: #00ff88;
+            font-weight: 700;
+            text-shadow: 0 0 10px #00ff88;
+            line-height: 1.6;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .single-joke {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.8;
+        }
+
+        .joke-category {
+            color: #888;
+            font-size: 12px;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc6f 100%);
+            border: none;
+            color: #1a1a2e;
+            padding: 14px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #00ffff 0%, #00cc99 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #00ff88;
+            border-radius: 6px;
+            background: transparent;
+            color: #00ff88;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .filter-btn:hover {
+            background: rgba(0, 255, 136, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc6f 100%);
+            color: #1a1a2e;
+            border-color: #00ff88;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 900;
+            color: #00ff88;
+            text-shadow: 0 0 10px #00ff88;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #00ff88;
+            padding: 40px;
+            font-size: 16px;
+            text-shadow: 0 0 10px #00ff88;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            border: 2px solid #00ff88;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: rgba(255, 107, 107, 0.1);
+            border: 2px solid #ff6b6b;
+            color: #ff9999;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .history {
+            background: linear-gradient(135deg, rgba(15, 52, 96, 0.5) 0%, rgba(22, 33, 62, 0.5) 100%);
+            border: 2px solid #00ff88;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .history-title {
+            color: #00ff88;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .history-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 15px;
+            border-left: 3px solid #00ff88;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #b0b0b0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(0, 255, 136, 0.1);
+            color: #e0e0e0;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+            font-size: 13px;
+        }
+
+        .status {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px #00ff88;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        footer {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .share-btn {
+            background: linear-gradient(135deg, #00ffff 0%, #00cc99 100%);
+            border: none;
+            color: #1a1a2e;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .share-btn:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 32px;
+            }
+
+            .joke-card {
+                padding: 25px;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="title">😂 JOKE GENERATOR</div>
+            <div class="subtitle">Laugh Out Loud with Random Jokes</div>
+        </header>
+
+        <div id="errorContainer"></div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-value" id="jokeCount">0</div>
+                <div class="stat-label">Jokes Loaded</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="favoriteCount">0</div>
+                <div class="stat-label">Favorites</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="categoryCount">0</div>
+                <div class="stat-label">Categories</div>
+            </div>
+        </div>
+
+        <div class="filters" id="filters"></div>
+
+        <div class="controls">
+            <button class="btn" onclick="getRandomJoke()">🎲 Get Random Joke</button>
+            <button class="btn btn-secondary" onclick="toggleFavorite()">❤️ Add to Favorites</button>
+            <button class="btn" onclick="copyToClipboard()">📋 Copy Joke</button>
+            <button class="btn btn-danger" onclick="clearFavorites()">🗑️ Clear Favorites</button>
+        </div>
+
+        <div class="joke-card" id="jokeCard">
+            <div class="loading">Loading first joke...</div>
+        </div>
+
+        <button class="share-btn" onclick="shareJoke()">📤 Share on Social Media</button>
+
+        <div class="history" id="historySection" style="display: none;">
+            <div class="history-title">⭐ Favorites</div>
+            <div id="favoritesList"></div>
+        </div>
+
+        <div class="status">
+            <div class="status-dot"></div>
+            <span>Jokes Loaded from API</span>
+        </div>
+
+        <footer>
+            😂 Joke Generator v1.0 • Powered by JokeAPI • Random Humor Generator
+        </footer>
+    </div>
+
+    <script>
+        const API_URL = 'https://v2.jokeapi.dev/joke/';
+        const categories = ['Any', 'General', 'Programming', 'Knock-knock', 'Dark', 'Spooky', 'Christmas'];
+        
+        let currentJoke = null;
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        let jokeCount = 0;
+        let selectedCategory = 'Any';
+
+        // Initialize
+        function init() {
+            renderFilters();
+            updateStats();
+            getRandomJoke();
+        }
+
+        function renderFilters() {
+            const filtersContainer = document.getElementById('filters');
+            categories.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn' + (category === 'Any' ? ' active' : '');
+                btn.textContent = category;
+                btn.onclick = () => selectCategory(category, btn);
+                filtersContainer.appendChild(btn);
+            });
+        }
+
+        function selectCategory(category, btn) {
+            selectedCategory = category;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            getRandomJoke();
+        }
+
+        async function getRandomJoke() {
+            const card = document.getElementById('jokeCard');
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.innerHTML = '';
+            card.innerHTML = '<div class="loading">Loading joke...</div>';
+
+            try {
+                let url = API_URL;
+                
+                if (selectedCategory === 'Any') {
+                    url += 'Any?type=single,twopart';
+                } else if (selectedCategory === 'Knock-knock') {
+                    url += 'Knock-Knock';
+                } else if (selectedCategory === 'Programming') {
+                    url += 'Programming';
+                } else if (selectedCategory === 'Dark') {
+                    url += 'Dark';
+                } else if (selectedCategory === 'Spooky') {
+                    url += 'Spooky';
+                } else if (selectedCategory === 'Christmas') {
+                    url += 'Christmas';
+                } else {
+                    url += 'General';
+                }
+
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch joke');
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.message || 'Failed to fetch joke');
+                }
+
+                currentJoke = data;
+                jokeCount++;
+                displayJoke(data);
+                updateStats();
+            } catch (error) {
+                errorContainer.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+                card.innerHTML = '<div class="empty-message">Failed to load joke. Please try again.</div>';
+            }
+        }
+
+        function displayJoke(joke) {
+            const card = document.getElementById('jokeCard');
+            const isFavorite = favorites.some(j => j.joke === JSON.stringify(joke));
+            
+            let content = `<div class="joke-type">${joke.type.toUpperCase()}</div>`;
+            
+            if (joke.type === 'twopart') {
+                content += `
+                    <div class="joke-content">
+                        <div class="joke-setup">${escapeHtml(joke.setup)}</div>
+                        <div class="joke-delivery">${escapeHtml(joke.delivery)}</div>
+                    </div>
+                `;
+            } else {
+                content += `
+                    <div class="joke-content">
+                        <div class="single-joke">${escapeHtml(joke.joke)}</div>
+                    </div>
+                `;
+            }
+            
+            content += `<div class="joke-category">📂 ${joke.category || 'General'}</div>`;
+            card.innerHTML = content;
+        }
+
+        function toggleFavorite() {
+            if (!currentJoke) return;
+            
+            const jokeStr = JSON.stringify(currentJoke);
+            const index = favorites.findIndex(j => j.joke === jokeStr);
+            
+            if (index > -1) {
+                favorites.splice(index, 1);
+            } else {
+                favorites.push({
+                    joke: jokeStr,
+                    date: new Date().toLocaleString()
+                });
+            }
+            
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            updateStats();
+            
+            const btn = event.target;
+            btn.textContent = index > -1 ? '❤️ Add to Favorites' : '💔 Remove from Favorites';
+            setTimeout(() => {
+                btn.textContent = '❤️ Add to Favorites';
+            }, 1500);
+        }
+
+        function displayFavorites() {
+            const list = document.getElementById('favoritesList');
+            const section = document.getElementById('historySection');
+            
+            if (favorites.length === 0) {
+                list.innerHTML = '<div class="empty-message">No favorites yet. Add one to get started!</div>';
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            list.innerHTML = favorites.map((fav, index) => {
+                const joke = JSON.parse(fav.joke);
+                const text = joke.type === 'twopart' 
+                    ? `${joke.setup} - ${joke.delivery}` 
+                    : joke.joke;
+                return `
+                    <div class="history-item" onclick="loadFavorite(${index})">
+                        ${text.substring(0, 60)}...
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function loadFavorite(index) {
+            const joke = JSON.parse(favorites[index].joke);
+            currentJoke = joke;
+            displayJoke(joke);
+        }
+
+        function copyToClipboard() {
+            if (!currentJoke) return;
+            
+            let text = '';
+            if (currentJoke.type === 'twopart') {
+                text = `${currentJoke.setup}\n${currentJoke.delivery}`;
+            } else {
+                text = currentJoke.joke;
+            }
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    btn.textContent = '📋 Copy Joke';
+                }, 1500);
+            });
+        }
+
+        function shareJoke() {
+            if (!currentJoke) return;
+            
+            let text = '';
+            if (currentJoke.type === 'twopart') {
+                text = `😂 ${currentJoke.setup}\n${currentJoke.delivery}`;
+            } else {
+                text = `😂 ${currentJoke.joke}`;
+            }
+            
+            const encodedText = encodeURIComponent(text + '\n\n#JokeGenerator');
+            
+            // Show share options
+            alert(`Share this joke:\n\n${text}\n\nLinks:\nTwitter: https://twitter.com/intent/tweet?text=${encodedText}\nFacebook: https://www.facebook.com/sharer/sharer.php`);
+        }
+
+        function clearFavorites() {
+            if (confirm('Are you sure you want to clear all favorites?')) {
+                favorites = [];
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+                updateStats();
+                displayFavorites();
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('jokeCount').textContent = jokeCount;
+            document.getElementById('favoriteCount').textContent = favorites.length;
+            document.getElementById('categoryCount').textContent = categories.length;
+            displayFavorites();
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
